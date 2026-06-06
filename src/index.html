@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexcape</title>
+  <meta name="description" content="Nexcape Browser — Explore the web, not be watched by it." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+
+    <!-- ── Tab Bar ──────────────────────────────────────── -->
+    <div id="tab-bar" role="tablist" aria-label="Browser tabs">
+      <!-- Tabs rendered by JS -->
+      <button id="tab-new-btn" class="tab-new-btn" title="New tab (Ctrl+T)" aria-label="Open new tab">
+        <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
+          <path d="M6.5 1v11M1 6.5h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- ── Toolbar ──────────────────────────────────────── -->
+    <div id="toolbar" role="toolbar" aria-label="Navigation toolbar">
+
+      <!-- Nav group -->
+      <div class="toolbar-group nav-group">
+        <button id="btn-back" class="nav-btn" title="Go back (Alt+←)" aria-label="Go back" disabled>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button id="btn-forward" class="nav-btn" title="Go forward (Alt+→)" aria-label="Go forward" disabled>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button id="btn-reload" class="nav-btn reload-btn" title="Reload (F5)" aria-label="Reload page">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path d="M13 2.5A6.5 6.5 0 1 1 8 1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+            <path d="M8 1l2.5 2.5L8 6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <button id="btn-home" class="nav-btn" title="New tab" aria-label="Home">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <path d="M1.5 6.5L7.5 1.5l6 5V13a.5.5 0 0 1-.5.5h-3.5v-4h-4v4H2a.5.5 0 0 1-.5-.5V6.5z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- Address bar -->
+      <div id="address-bar-wrap">
+        <button class="address-bar-security" id="security-btn" aria-label="Site security info" tabindex="-1">
+          <svg id="security-icon" width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M6 1L2 3v3c0 2.2 1.7 4.3 4 4.8C8.3 10.3 10 8.2 10 6V3L6 1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <input
+          id="address-bar"
+          type="text"
+          placeholder="Search or enter a URL..."
+          autocomplete="off"
+          spellcheck="false"
+          aria-label="Address bar"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-controls="suggestions"
+          aria-expanded="false"
+        />
+        <span id="zoom-indicator" class="zoom-indicator" hidden>100%</span>
+        <button id="btn-bookmark" class="address-bar-bookmark" title="Bookmark this page (Ctrl+D)" aria-label="Add bookmark">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path id="bookmark-path" d="M3 2h8a.5.5 0 0 1 .5.5v10l-4.5-3-4.5 3V2.5A.5.5 0 0 1 3 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div id="suggestions" role="listbox" aria-label="Suggestions"></div>
+      </div>
+
+      <!-- Right-side buttons -->
+      <div class="toolbar-right">
+        <button id="btn-find" class="nav-btn" title="Find in page (Ctrl+F)" aria-label="Find in page">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M10 10l3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <div class="toolbar-separator"></div>
+        <button id="btn-sidebar" class="nav-btn" title="Bookmarks &amp; History" aria-label="Toggle sidebar">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <rect x="1.5" y="2" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M6 2v11" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M8.5 5.5h3M8.5 7.5h3M8.5 9.5h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <button id="btn-settings" class="nav-btn" title="Settings" aria-label="Settings">
+          <svg width="15" height="15" viewBox="0 0 15 15" fill="none">
+            <circle cx="7.5" cy="7.5" r="2" stroke="currentColor" stroke-width="1.4"/>
+            <path d="M7.5 1.5v1M7.5 12.5v1M1.5 7.5h1M12.5 7.5h1M3.4 3.4l.7.7M10.9 10.9l.7.7M3.4 11.6l.7-.7M10.9 4.1l.7-.7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Progress Bar ─────────────────────────────────── -->
+    <div id="progress-bar" role="progressbar" aria-hidden="true"></div>
+
+    <!-- ── Content Area ─────────────────────────────────── -->
+    <div id="content">
+      <div id="no-tabs-placeholder" class="visible">
+        <div style="font-size:40px;opacity:0.2">🌌</div>
+        <p style="color:var(--text-muted);font-size:13px">Press Ctrl+T to open a new tab</p>
+      </div>
+    </div>
+
+    <!-- ── Find Bar ──────────────────────────────────────── -->
+    <div id="find-bar" hidden aria-label="Find in page">
+      <svg class="find-bar-icon" width="14" height="14" viewBox="0 0 14 14" fill="none">
+        <circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.4"/>
+        <path d="M9.5 9.5l2.5 2.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+      </svg>
+      <input id="find-input" type="text" placeholder="Find in page…" autocomplete="off" spellcheck="false" />
+      <span id="find-count" class="find-count"></span>
+      <button id="find-prev" class="find-nav-btn" title="Previous (Shift+Enter)">
+        <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+          <path d="M1 5.5L5 2l4 3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button id="find-next" class="find-nav-btn" title="Next (Enter)">
+        <svg width="10" height="7" viewBox="0 0 10 7" fill="none">
+          <path d="M1 1.5L5 5l4-3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+      <button id="find-close" class="find-close-btn" title="Close (Esc)">
+        <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+          <path d="M1 1l8 8M9 1L1 9" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- ── Sidebar ───────────────────────────────────────── -->
+    <aside id="sidebar" aria-label="Bookmarks and History">
+      <div class="sidebar-header">
+        <div class="sidebar-tabs">
+          <button id="sidebar-tab-bookmarks" class="sidebar-tab-btn active">Bookmarks</button>
+          <button id="sidebar-tab-history" class="sidebar-tab-btn">History</button>
+        </div>
+        <button class="sidebar-close" id="sidebar-close-btn" title="Close sidebar" aria-label="Close sidebar">✕</button>
+      </div>
+      <div class="sidebar-content" id="sidebar-content">
+        <div class="sidebar-empty" id="sidebar-empty">
+          <div class="sidebar-empty-icon">🔖</div>
+          <p>No bookmarks yet</p>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ── Toast ─────────────────────────────────────────── -->
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  </div>
+
+  <!-- Error display for debugging -->
+  <div id="err-display" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:#0B1120;color:#ef4444;padding:24px;font-family:monospace;font-size:12px;z-index:9999;overflow:auto;white-space:pre-wrap;"></div>
+  <script>
+    window.onerror = function(msg, src, line, col, err) {
+      var d = document.getElementById('err-display');
+      d.style.display = 'block';
+      d.textContent = 'RUNTIME ERROR\n' + msg + '\nFile: ' + src + '\nLine: ' + line + '\n\n' + (err ? err.stack : '');
+      return false;
+    };
+    window.onunhandledrejection = function(e) {
+      var d = document.getElementById('err-display');
+      d.style.display = 'block';
+      d.textContent = (d.textContent || '') + '\nUNHANDLED PROMISE REJECTION\n' + (e.reason ? (e.reason.stack || e.reason.message || String(e.reason)) : String(e));
+    };
+  </script>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

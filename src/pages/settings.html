@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Settings — Nexcape</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0B1120;
+      --surface: #1A2540;
+      --raised:  #212F4F;
+      --hover:   #263660;
+      --purple:  #7C3AED;
+      --purple2: #9B67F5;
+      --cyan:    #22D3EE;
+      --green:   #10B981;
+      --red:     #EF4444;
+      --yellow:  #F59E0B;
+      --text:    #F1F5F9;
+      --muted:   #64748B;
+      --border:  rgba(148,163,184,0.08);
+      --bordera: rgba(34,211,238,0.2);
+      --cdim:    rgba(34,211,238,0.12);
+      --pdim:    rgba(124,58,237,0.18);
+    }
+
+    html, body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+      scroll-behavior: smooth;
+    }
+
+    /* Layout */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* Sidebar Nav */
+    .nav {
+      width: 200px;
+      flex-shrink: 0;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 32px 12px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 4px 12px 24px;
+    }
+
+    .nav-logo-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--purple), var(--cyan));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.35);
+      flex-shrink: 0;
+    }
+
+    .nav-logo-text { font-size: 14px; font-weight: 600; }
+
+    .nav-section-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      padding: 8px 12px 4px;
+      margin-top: 12px;
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--muted);
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.15s;
+      margin-bottom: 1px;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      background: var(--raised);
+      color: var(--text);
+    }
+
+    .nav-link.active { color: var(--cyan); background: var(--cdim); }
+
+    .nav-link-icon { font-size: 14px; }
+
+    /* Main content */
+    .main {
+      flex: 1;
+      padding: 40px 48px;
+      max-width: 740px;
+    }
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff 30%, var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 4px;
+    }
+
+    .page-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 36px;
+    }
+
+    /* Sections */
+    .section {
+      margin-bottom: 32px;
+      scroll-margin-top: 20px;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--cyan);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--bordera), transparent);
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    /* Setting row */
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      gap: 16px;
+      transition: background 0.15s;
+    }
+
+    .row:last-child { border-bottom: none; }
+    .row:hover { background: rgba(255,255,255,0.02); }
+
+    .row-info { flex: 1; min-width: 0; }
+    .row-label { font-size: 13px; font-weight: 500; color: var(--text); }
+    .row-desc  { font-size: 11px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+    .row-control { flex-shrink: 0; }
+
+    /* Toggle */
+    .toggle { position: relative; width: 40px; height: 22px; cursor: pointer; display: block; }
+    .toggle input { display: none; }
+    .toggle-track {
+      position: absolute; inset: 0;
+      border-radius: 11px;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      transition: background 0.2s, border-color 0.2s;
+    }
+    .toggle input:checked + .toggle-track {
+      background: var(--purple);
+      border-color: var(--purple);
+    }
+    .toggle-thumb {
+      position: absolute; top: 3px; left: 3px;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+    }
+    .toggle input:checked ~ .toggle-thumb { transform: translateX(18px); }
+
+    /* Select */
+    select {
+      background: var(--raised);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 7px 32px 7px 12px;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2364748B' stroke-width='1.5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      transition: border-color 0.15s;
+      min-width: 160px;
+    }
+
+    select:focus { border-color: rgba(34,211,238,0.4); }
+
+    /* Text input */
+    .text-input {
+      background: var(--raised);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 7px 12px;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.15s;
+      min-width: 240px;
+    }
+
+    .text-input:focus { border-color: rgba(34,211,238,0.4); }
+    .text-input::placeholder { color: var(--muted); }
+
+    /* Buttons */
+    .btn-danger {
+      padding: 7px 16px;
+      background: rgba(239,68,68,0.1);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: var(--red);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+    }
+    .btn-danger:hover { background: rgba(239,68,68,0.2); border-color: var(--red); }
+
+    .btn-secondary {
+      padding: 7px 16px;
+      background: var(--raised);
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.15s;
+    }
+    .btn-secondary:hover { background: var(--hover); border-color: var(--bordera); }
+
+    /* Keyboard shortcuts table */
+    .shortcuts-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .shortcuts-table tr:last-child td { border-bottom: none; }
+
+    .shortcuts-table td {
+      padding: 10px 14px;
+      font-size: 12px;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .shortcuts-table td:first-child { color: var(--muted); width: 55%; }
+
+    kbd {
+      display: inline-block;
+      padding: 2px 7px;
+      background: var(--raised);
+      border: 1px solid rgba(148,163,184,0.2);
+      border-radius: 5px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--cyan);
+      box-shadow: 0 1px 0 rgba(148,163,184,0.15);
+    }
+
+    /* About */
+    .about-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .about-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--purple), var(--cyan));
+    }
+
+    .about-mark {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, var(--purple), var(--cyan));
+      margin: 0 auto 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      box-shadow: 0 6px 24px rgba(124,58,237,0.4);
+    }
+
+    .about-name { font-size: 18px; font-weight: 700; }
+    .about-ver  { font-size: 12px; color: var(--muted); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+    .about-tag  { font-size: 12px; color: var(--muted); margin-top: 10px; font-style: italic; opacity: 0.7; }
+    .about-tag strong { color: var(--cyan); font-style: normal; }
+
+    /* Badge */
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .badge-rust { background: rgba(249,115,22,0.15); color: #f97316; }
+    .badge-tauri { background: var(--cdim); color: var(--cyan); }
+
+    .about-badges { margin-top: 12px; display: flex; justify-content: center; gap: 6px; }
+
+    /* Toast */
+    #toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(12px);
+      background: var(--surface);
+      border: 1px solid rgba(34,211,238,0.3);
+      color: var(--cyan);
+      padding: 9px 20px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 500;
+      opacity: 0;
+      transition: all 0.25s;
+      pointer-events: none;
+      z-index: 100;
+      white-space: nowrap;
+    }
+
+    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    #toast.error { border-color: rgba(239,68,68,0.3); color: var(--red); }
+
+    /* Divider */
+    .divider { height: 1px; background: var(--border); margin: 4px 0; }
+  </style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- Nav -->
+  <nav class="nav">
+    <div class="nav-logo">
+      <div class="nav-logo-mark">🌌</div>
+      <span class="nav-logo-text">Nexcape</span>
+    </div>
+
+    <div class="nav-section-label">Preferences</div>
+    <a class="nav-link active" href="#search" data-section="search">
+      <span class="nav-link-icon">🔍</span> Search
+    </a>
+    <a class="nav-link" href="#appearance" data-section="appearance">
+      <span class="nav-link-icon">🎨</span> Appearance
+    </a>
+    <a class="nav-link" href="#newtab" data-section="newtab">
+      <span class="nav-link-icon">✨</span> New Tab
+    </a>
+    <a class="nav-link" href="#privacy" data-section="privacy">
+      <span class="nav-link-icon">🔒</span> Privacy
+    </a>
+
+    <div class="nav-section-label">Reference</div>
+    <a class="nav-link" href="#shortcuts" data-section="shortcuts">
+      <span class="nav-link-icon">⌨️</span> Shortcuts
+    </a>
+    <a class="nav-link" href="#about" data-section="about">
+      <span class="nav-link-icon">ℹ️</span> About
+    </a>
+  </nav>
+
+  <!-- Main -->
+  <main class="main">
+    <h1 class="page-title">Settings</h1>
+    <p class="page-sub">Customize your Nexcape experience</p>
+
+    <!-- Search -->
+    <div class="section" id="search">
+      <div class="section-title">🔍 Search</div>
+      <div class="card">
+        <div class="row">
+          <div class="row-info">
+            <div class="row-label">Default search engine</div>
+            <div class="row-desc">Used when you type text (not a URL) in the address bar</div>
+          </div>
+          <div class="row-control">
+            <select id="sel-engine">
+              <option value="https://www.startpage.com/search?q=">Startpage</option>
+              <option value="https://duckduckgo.com/?q=">DuckDuckGo</option>
+              <option value="https://search.brave.com/search?q=">Brave Search</option>
+              <option value="https://www.google.com/search?q=">Google</option>
+              <option value="https://www.bing.com/search?q=">Bing</option>
+              <option value="https://search.yahoo.com/search?p=">Yahoo</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-info">
+            <div class="row-label">Homepage</div>
+            <div class="row-desc">URL to open when clicking the home button</div>
+          </div>
+          <div class="row-control">
+            <input type="text" class="text-input" id="input-homepage"
+              placeholder="nexcape://newtab" />
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-info">
+            <div class="row-label">Show address bar suggestions</div>
+            <div class="row-desc">Auto-complete from bookmarks and history</div>
+          </div>
+          <div class="row-control">
+            <label class="toggle">
+              <input type="checkbox" id="tog-suggestions" checked />
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Appearance -->
+    <div class="section" id="appearance">
+      <div class="section-title">🎨 Appearance</div>
+      <div class="card">
+        <div class="row">
+          <div class="row-info">
+            <div class="row-label">Default zoom level</div>
+            <div class="row-desc">Initial zoom for all web pages (Ctrl+/- to adjust per page)</div>
+          </div>
+          <div class="row-control">
+            <select id="sel-zoom">
+              <option value="0.75">75%</option>
+              <option value="0.9">90%</option>
+              <option value="1.0" selected>100% (Default)</option>
+              <option value="1.1">110%</option>
+              <option value="1.25">125%</option>
+              <option value="1.5">150%</option>
+            </select>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-info">
+            <div class="row-label">Show full URL in address bar</div>
+            <div class="row-desc">Display the complete URL including protocol (https://)</div>
+          </div>
+          <div class="row-control">
+            <label class="toggle">
+              <input type="checkbox" id="tog-full-url" checked />
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- New Tab -->
+    <div class="section" id="newtab">
+      <div class="section-title">✨ New Tab</div>
+      <div class="card">
+        <div class="row">
+          <div class="row-info">
+            <div class="row-label">Show clock</div>
+            <div class="row-desc">Display the current time on the new tab page</div>
+          </div>
+          <div class="row-control">
+            <label class="toggle">
+              <input type="checkbox" id="tog-clock" checked />
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-info">
+            <div class="row-label">Show speed dial</div>
+            <div class="row-desc">Display quick-access site shortcuts</div>
+          </div>
+          <div class="row-control">
+            <label class="toggle">
+              <input type="checkbox" id="tog-speeddial" checked />
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-info">
+            <div class="row-label">Show recent history</div>
+            <div class="row-desc">Display recently visited pages on the new tab page</div>
+          </div>
+          <div class="row-control">
+            <label class="toggle">
+              <input type="checkbox" id="tog-recent" checked />
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Privacy -->
+    <div class="section" id="privacy">
+      <div class="section-title">🔒 Privacy &amp; Data</div>
+      <div class="card">
+        <div class="row">
+          <div class="row-info">
+            <div class="row-label">Save browsing history</div>
+            <div class="row-desc">Record pages you visit for search suggestions and history panel</div>
+          </div>
+          <div class="row-control">
+            <label class="toggle">
+              <input type="checkbox" id="tog-history" checked />
+              <div class="toggle-track"></div>
+              <div class="toggle-thumb"></div>
+            </label>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-info">
+            <div class="row-label">Clear browsing history</div>
+            <div class="row-desc">Permanently delete all visited pages from history</div>
+          </div>
+          <div class="row-control">
+            <button class="btn-danger" id="btn-clear-history">Clear History</button>
+          </div>
+        </div>
+        <div class="row">
+          <div class="row-info">
+            <div class="row-label">Clear all bookmarks</div>
+            <div class="row-desc">Remove all saved bookmarks permanently</div>
+          </div>
+          <div class="row-control">
+            <button class="btn-danger" id="btn-clear-bookmarks">Clear Bookmarks</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Keyboard Shortcuts -->
+    <div class="section" id="shortcuts">
+      <div class="section-title">⌨️ Keyboard Shortcuts</div>
+      <div class="card">
+        <table class="shortcuts-table">
+          <tr>
+            <td>New tab</td>
+            <td><kbd>Ctrl</kbd> + <kbd>T</kbd></td>
+          </tr>
+          <tr>
+            <td>Close tab</td>
+            <td><kbd>Ctrl</kbd> + <kbd>W</kbd></td>
+          </tr>
+          <tr>
+            <td>Next / Previous tab</td>
+            <td><kbd>Ctrl</kbd> + <kbd>Tab</kbd> / <kbd>Shift</kbd></td>
+          </tr>
+          <tr>
+            <td>Switch to tab 1–9</td>
+            <td><kbd>Ctrl</kbd> + <kbd>1</kbd> … <kbd>9</kbd></td>
+          </tr>
+          <tr>
+            <td>Focus address bar</td>
+            <td><kbd>Ctrl</kbd> + <kbd>L</kbd></td>
+          </tr>
+          <tr>
+            <td>Reload page</td>
+            <td><kbd>F5</kbd> or <kbd>Ctrl</kbd> + <kbd>R</kbd></td>
+          </tr>
+          <tr>
+            <td>Go back / forward</td>
+            <td><kbd>Alt</kbd> + <kbd>←</kbd> / <kbd>→</kbd></td>
+          </tr>
+          <tr>
+            <td>Find in page</td>
+            <td><kbd>Ctrl</kbd> + <kbd>F</kbd></td>
+          </tr>
+          <tr>
+            <td>Bookmark page</td>
+            <td><kbd>Ctrl</kbd> + <kbd>D</kbd></td>
+          </tr>
+          <tr>
+            <td>Zoom in / out / reset</td>
+            <td><kbd>Ctrl</kbd> + <kbd>+</kbd> / <kbd>-</kbd> / <kbd>0</kbd></td>
+          </tr>
+          <tr>
+            <td>Close find bar / sidebar</td>
+            <td><kbd>Esc</kbd></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- About -->
+    <div class="section" id="about">
+      <div class="section-title">ℹ️ About</div>
+      <div class="about-card">
+        <div class="about-mark">🌌</div>
+        <div class="about-name">Nexcape Browser</div>
+        <div class="about-ver">v0.1.0</div>
+        <div class="about-badges">
+          <span class="badge badge-rust">Rust</span>
+          <span class="badge badge-tauri">Tauri v2</span>
+        </div>
+        <div class="about-tag">"Explore the web, <strong>not be watched</strong> by it."</div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast"></div>
+
+<script>
+  const invoke = window.__TAURI__?.core?.invoke || (async () => null);
+  const emit   = window.__TAURI__?.event?.emit   || (async () => null);
+
+  function toast(msg, error = false) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = error ? 'error show' : 'show';
+    setTimeout(() => el.classList.remove('show'), 2200);
+  }
+
+  async function load() {
+    try {
+      const [engine, homepage, suggestions, zoom, fullUrl,
+             clock, speeddial, recent, history] = await Promise.all([
+        invoke('get_setting', { key: 'search_engine' }),
+        invoke('get_setting', { key: 'homepage' }),
+        invoke('get_setting', { key: 'show_suggestions' }),
+        invoke('get_setting', { key: 'default_zoom' }),
+        invoke('get_setting', { key: 'show_full_url' }),
+        invoke('get_setting', { key: 'new_tab_clock' }),
+        invoke('get_setting', { key: 'new_tab_speeddial' }),
+        invoke('get_setting', { key: 'new_tab_recent' }),
+        invoke('get_setting', { key: 'save_history' }),
+      ]);
+
+      if (engine) document.getElementById('sel-engine').value = engine;
+      if (homepage) document.getElementById('input-homepage').value = homepage;
+      document.getElementById('tog-suggestions').checked = suggestions !== 'false';
+      if (zoom) document.getElementById('sel-zoom').value = zoom;
+      document.getElementById('tog-full-url').checked = fullUrl !== 'false';
+      document.getElementById('tog-clock').checked     = clock !== 'false';
+      document.getElementById('tog-speeddial').checked  = speeddial !== 'false';
+      document.getElementById('tog-recent').checked     = recent !== 'false';
+      document.getElementById('tog-history').checked    = history !== 'false';
+    } catch (_) { /* Standalone / no DB */ }
+  }
+
+  async function save(key, value) {
+    try {
+      await invoke('set_setting', { key, value });
+      toast('✓ Saved');
+    } catch { toast('Failed to save', true); }
+  }
+
+  // Search
+  document.getElementById('sel-engine').addEventListener('change', async e => {
+    await save('search_engine', e.target.value);
+    await emit('nexcape:settings-changed', { key: 'search_engine', value: e.target.value }).catch(() => {});
+  });
+
+  let homepageTimer;
+  document.getElementById('input-homepage').addEventListener('input', e => {
+    clearTimeout(homepageTimer);
+    homepageTimer = setTimeout(() => save('homepage', e.target.value), 600);
+  });
+
+  document.getElementById('tog-suggestions').addEventListener('change', e => save('show_suggestions', String(e.target.checked)));
+
+  // Appearance
+  document.getElementById('sel-zoom').addEventListener('change', e => {
+    save('default_zoom', e.target.value);
+    emit('nexcape:settings-changed', { key: 'default_zoom', value: e.target.value }).catch(() => {});
+  });
+  document.getElementById('tog-full-url').addEventListener('change', e => save('show_full_url', String(e.target.checked)));
+
+  // New Tab
+  document.getElementById('tog-clock').addEventListener('change',     e => save('new_tab_clock', String(e.target.checked)));
+  document.getElementById('tog-speeddial').addEventListener('change',  e => save('new_tab_speeddial', String(e.target.checked)));
+  document.getElementById('tog-recent').addEventListener('change',     e => save('new_tab_recent', String(e.target.checked)));
+
+  // Privacy
+  document.getElementById('tog-history').addEventListener('change',    e => save('save_history', String(e.target.checked)));
+
+  document.getElementById('btn-clear-history').addEventListener('click', async () => {
+    if (!confirm('Clear all browsing history? This cannot be undone.')) return;
+    try {
+      await invoke('clear_history');
+      toast('✓ History cleared');
+    } catch { toast('Failed to clear history', true); }
+  });
+
+  document.getElementById('btn-clear-bookmarks').addEventListener('click', async () => {
+    if (!confirm('Remove ALL bookmarks? This cannot be undone.')) return;
+    try {
+      const bks = await invoke('get_bookmarks') || [];
+      await Promise.all(bks.map(b => invoke('remove_bookmark', { id: b.id })));
+      toast('✓ Bookmarks cleared');
+    } catch { toast('Failed to clear bookmarks', true); }
+  });
+
+  // Nav highlight on scroll
+  const sections  = document.querySelectorAll('.section');
+  const navLinks  = document.querySelectorAll('.nav-link');
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(l => l.classList.toggle('active', l.dataset.section === e.target.id));
+      }
+    });
+  }, { threshold: 0.4 });
+
+  sections.forEach(s => obs.observe(s));
+
+  load();
+</script>
+</body>
+</html>
